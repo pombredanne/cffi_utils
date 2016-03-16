@@ -1,0 +1,75 @@
+cffi_utils.sowrapper:
+---------------------
+
+FUNCTIONS
+    get_lib_ffi_resource(module_name, libpath, c_hdr)
+        module_name-->str: module name to retrieve resource
+        libpath-->str: shared library filename with optional path
+        c_hdr-->str: C-style header definitions for functions to wrap
+        Returns-->(ffi, lib)
+        
+        The 'clobbered' paths are tried FIRST, falling back to trying the
+            unchanged libpath
+        For generating the 'clobbered' filenames,libpath has to end in '.so'
+        
+        Use this method when you are loading a package-specific shared library
+        If you want to load a system-wide shared library, use get_lib_ffi_shared
+        instead
+    
+    get_lib_ffi_shared(libpath, c_hdr)
+        libpath-->str: shared library filename with optional path
+        c_hdr-->str: C-style header definitions for functions to wrap
+        Returns-->(ffi, lib)
+
+
+
+cffi_utils.ffi:
+---------------
+class FFIExt(cffi.api.FFI)
+    get_buffer(self, *args)
+        all args-->_cffi_backend.CDataOwn
+        Must be a pointer or an array
+        Returns-->buffer (if a SINGLE argument was provided)
+              LIST of buffer (if a args was a tuple or list)
+
+    get_bytes(self, *args)
+        all args-->_cffi_backend.CDataOwn
+        Must be a pointer or an array
+        Returns-->bytes (if a SINGLE argument was provided)
+              LIST of bytes (if a args was a tuple or list)
+
+    get_cdata(self, *args)
+        all args-->_cffi_backend.buffer
+        Returns-->cdata (if a SINGLE argument was provided)
+              LIST of cdata (if a args was a tuple or list)
+
+
+
+cffi_utils.utils2to3:
+---------------------
+
+
+
+
+
+FUNCTIONS
+    chr(x)
+    
+    decode(s, encoding='latin-1')
+    
+    encode(s, encoding='latin-1')
+    
+    fromBytes(b)
+    
+    inputFromBytes(func, *args, **kwargs)
+    
+    inputToBytes(func, *args, **kwargs)
+    
+    ord(x)
+    
+    outputFromBytes(func, *args, **kwargs)
+    
+    outputToBytes(func, *args, **kwargs)
+    
+    toBytes(s)
+
