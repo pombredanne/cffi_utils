@@ -5,7 +5,6 @@ cffi_utils: Utilities to write python wrappers around C code
 cffi_utils.sowrapper:
 ---------------------
 
-.. code-block:: text
     get_lib_ffi_resource(module_name, libpath, c_hdr)
         module_name-->str: module name to retrieve resource
         libpath-->str: shared library filename with optional path
@@ -30,7 +29,6 @@ cffi_utils.sowrapper:
 cffi_utils.ffi:
 ---------------
 
-.. code-block:: text
     class FFIExt(cffi.api.FFI)
         get_buffer(self, *args)
             all args-->_cffi_backend.CDataOwn
@@ -54,7 +52,6 @@ cffi_utils.ffi:
 cffi_utils.utils2to3:
 ---------------------
 
-.. code-block:: text
     toBytes(s)
         s-->str / bytes
         Returns-->bytes (Py2/3 compatible)
