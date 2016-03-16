@@ -85,7 +85,9 @@ Licensed under the GPL version 3 or later. See LICENSE-GPL-v3.txt
 
 See the following projects for examples where I have used this:
 
+  https://github.com/sundarnagarajan/py_poly1305aes/blob/master/poly1305_aes/poly1305.py
 
+  https://github.com/sundarnagarajan/py_poly1305-donna/blob/master/poly1305_donna/poly1305.py
 
 **INSTALLATION:**
 
@@ -93,7 +95,7 @@ Using pip from pypi:
     pip install cffi_utils
 
 Using pip from git:
-    pip install 'git+https://github.com/sundarnagarajan/py_poly1305-donna.git'
+    pip install 'git+https://github.com/sundarnagarajan/cffi_utils.git'
 
 Using setup.py:
     python setup.py install
