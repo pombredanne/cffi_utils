@@ -11,14 +11,15 @@ os.chdir(os.path.dirname(sys.argv[0]) or ".")
 PACKAGE DATA
 ==============================================================================
 '''
-toplevel = 'cffi_utils'
-version = '0.1'
+name = 'cffi_utils'
+version = '0.12'
 packages = find_packages()
 description = 'Utilities to write python wrappers around C code'
 license = (
     'License :: OSI Approved :: '
     'GNU Lesser General Public License v3 or later (LGPLv3+)'
 )
+provides = ['cffi_utils']
 
 long_description = open('README.rst').read()
 url = 'https://github.com/sundarnagarajan/cffi_utils'
@@ -72,16 +73,16 @@ ADDL_KWARGS = dict(
 '''
 
 
-def get_dirtree(toplevel, dirlist=[]):
+def get_dirtree(topdir, dirlist=[]):
     '''
-    toplevel-->str: must be name of a dir under current working dir
-    dirlist-->list of str: must all be names of dirs under toplevel
+    topdir-->str: must be name of a dir under current working dir
+    dirlist-->list of str: must all be names of dirs under topdir
     '''
     ret = []
     curdir = os.getcwd()
-    if not os.path.isdir(toplevel):
+    if not os.path.isdir(topdir):
         return ret
-    os.chdir(toplevel)
+    os.chdir(topdir)
     try:
         for dirname in dirlist:
             if not os.path.isdir(dirname):
@@ -95,43 +96,35 @@ def get_dirtree(toplevel, dirlist=[]):
     finally:
         os.chdir(curdir)
 
+# Make some keywords MANDATORY
+for k in [
+    'name', 'version', 'description', 'license',
+]:
+    if k not in locals():
+        raise Exception('Missing mandatory keyword: ' + k)
 
-# Required keywords
-kwdict = dict(
-    name=toplevel,
-    version=version,
-    packages=packages,
-    description=description,
-    license=license,
-)
-
-# Optional keywords
-kwdict.update(dict(
-    # requires=globals().get('requires,', []),
-    install_requires=globals().get('install_requires,', []),
-    long_description=globals().get('long_description', ''),
-    url=globals().get('url', ''),
-    download_url=globals().get('download_url', ''),
-    author=globals().get('author', ''),
-    author_email=globals().get('author_email', ''),
-    maintainer=globals().get('maintainer', ''),
-    maintainer_email=globals().get('maintainer_email', ''),
-    classifiers=globals().get('classifiers', []),
-    keywords=globals().get('keywords', []),
-    zip_safe=globals().get('zip_safe', False),
-))
-kwdict.update(ADDL_KWARGS)
-
-# More optional keywords, but which are added conditionally
-ext_modules = globals().get('ext_modules', [])
-if ext_modules:
-    kwdict['ext_modules'] = ext_modules
-
-dirlist = globals().get('data_dirs', None)
+# keywords that are computed from variables
+dirlist = locals().get('data_dirs', None)
 if isinstance(dirlist, list):
-    kwdict['package_dir'] = {toplevel: toplevel}
-    kwdict['package_data'] = {toplevel:
-                              get_dirtree(toplevel, dirlist)}
+    package_dir = {name: name}
+    package_data = {name: get_dirtree(topdir=name, dirlist=dirlist)}
+
+known_keywords = [
+    'name', 'version', 'packages', 'description', 'license',
+    'install_requires', 'requires', 'setup_requires',
+    'ext_modules', 'package_dir', 'package_data',
+    'zip_safe', 'classifiers', 'keywords',
+    'long_description', 'url', 'download_url',
+    'author', 'author_email', 'maintainer', 'maintainer_email',
+]
+
+kwdict = {}
+for k in known_keywords:
+    if k in locals():
+        kwdict[k] = locals()[k]
+
+# Additional keywords specified by user - shouldn't be required, normally
+kwdict.update(ADDL_KWARGS)
 
 
 setup(**kwdict)
