@@ -65,14 +65,14 @@ def get_lib_ffi_resource(module_name, libpath, c_hdr):
         if clobbered_path == libpath:
             raise
     try:
-        libres = resource_filename(module_name, libpath)
+        libres = resource_filename(module_name, clobbered_path)
         return get_lib_ffi_shared(libpath=libres, c_hdr=c_hdr)
     except:
         # we need third attempt only on pypy!
         if six.PY3:
             raise
     # if PYPY try ./libpath
-    libres = resource_filename(module_name, './' + libpath)
+    libres = resource_filename(module_name, './' + clobbered_path)
     return get_lib_ffi_shared(libpath=libres, c_hdr=c_hdr)
 
 
