@@ -23,6 +23,8 @@ from .ffi import FFIExt
 import six
 import sys
 from pkg_resources import resource_filename
+from distutils import sysconfig
+from distutils.util import get_platform
 
 
 def get_lib_ffi_resource(module_name, libpath, c_hdr):
@@ -44,14 +46,16 @@ def get_lib_ffi_resource(module_name, libpath, c_hdr):
     # The format of the clobbered name doesn't seem to be documented anywhere
     # and is generated here by visual inspection :-(
     lib_base = libpath.rsplit('.so', 1)[0]
+    ending = sysconfig.get_config_var('SO')
+    plat_name = get_platform().replace('-', '_')
     if six.PY2 and sys.subversion[0].lower() == 'pypy':
-        clobbered_path = '%s.%s-26-%s.so' % (
+        clobbered_path = '%s.%s-26-%s' % (
             lib_base, sys.subversion[0].lower(), sys._multiarch,
-        )
+        ) + ending
     elif six.PY2:
-        clobbered_path = libpath
+        clobbered_path = lib_base + ending
     elif six.PY3:
-        clobbered_path = lib_base + '.' + sys.implementation.cache_tag + 'm.so'
+        clobbered_path = lib_base + '.' + plat_name + ending
 
     try:
         libres = resource_filename(module_name, clobbered_path)
@@ -60,8 +64,15 @@ def get_lib_ffi_resource(module_name, libpath, c_hdr):
         # On Py2 we only need to try once
         if clobbered_path == libpath:
             raise
-        pass
-    libres = resource_filename(module_name, libpath)
+    try:
+        libres = resource_filename(module_name, libpath)
+        return get_lib_ffi_shared(libpath=libres, c_hdr=c_hdr)
+    except:
+        # we need third attempt only on pypy!
+        if six.PY3:
+            raise
+    # if PYPY try ./libpath
+    libres = resource_filename(module_name, './' + libpath)
     return get_lib_ffi_shared(libpath=libres, c_hdr=c_hdr)
 
 
