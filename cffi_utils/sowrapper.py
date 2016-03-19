@@ -23,7 +23,7 @@ from .ffi import FFIExt
 import six
 import sys
 from pkg_resources import resource_filename
-from distutils import sysconfig as dist_sysconfig
+import sysconfig
 
 
 def get_lib_ffi_resource(module_name, libpath, c_hdr):
@@ -56,12 +56,17 @@ def get_lib_ffi_resource(module_name, libpath, c_hdr):
     '''
     ending = '.so'
     base = libpath.rsplit(ending, 1)[0]
-    abi = dist_sysconfig.get_config_var('SOABI')
-    if abi != '':
+    abi = sysconfig.get_config_var('SOABI')
+    if abi is not None:
         abi = '.' + abi
     else:
         abi = ''
-    multi_arch = '-' + sys._multiarch
+
+    multi_arch = sysconfig.get_config_var('MULTIARCH')
+    if multi_arch is None:
+        multi_arch = ''
+    else:
+        multi_arch = '-' + multi_arch
 
     if six.PY2 and sys.subversion[0].lower() == 'pypy':
         n1 = base + abi + multi_arch + ending
