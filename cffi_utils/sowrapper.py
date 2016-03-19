@@ -72,7 +72,7 @@ def get_lib_ffi_resource(module_name, libpath, c_hdr):
         if six.PY3:
             raise
     # if PYPY try ./libpath
-    libres = resource_filename(module_name, './' + clobbered_path)
+    libres = './' + os.path.basename(clobbered_path)
     return get_lib_ffi_shared(libpath=libres, c_hdr=c_hdr)
 
 
