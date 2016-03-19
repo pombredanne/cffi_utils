@@ -22,10 +22,8 @@
 from .ffi import FFIExt
 import six
 import sys
-import os
 from pkg_resources import resource_filename
-from distutils import sysconfig
-from distutils.util import get_platform
+from distutils import sysconfig as dist_sysconfig
 
 
 def get_lib_ffi_resource(module_name, libpath, c_hdr):
@@ -35,46 +33,55 @@ def get_lib_ffi_resource(module_name, libpath, c_hdr):
     c_hdr-->str: C-style header definitions for functions to wrap
     Returns-->(ffi, lib)
 
-    The 'clobbered' paths are tried FIRST, falling back to trying the
-        unchanged libpath
-    For generating the 'clobbered' filenames,libpath has to end in '.so'
-
     Use this method when you are loading a package-specific shared library
     If you want to load a system-wide shared library, use get_lib_ffi_shared
     instead
+
+    PEP3140: ABI version tagged .so files:
+        https://www.python.org/dev/peps/pep-3149/
+
+    There's still one unexplained bit: pypy adds '-' + sys._multiarch()
+    at the end (looks like 'x86_64-linux-gnu'), but neither py2 or py3 do
+
+    _I_ think Py2 and Py3 _MAY_ start adding sys._multiarch at some time
+
+    So, we generate three forms:
+        1. With sys._multiarch
+        2. Without sys._multiarch
+        3. libpath as-is
+    For different versions we try these in different orders (for efficiency):
+        Python2                 Python3                 Pypy
+
+        2 --> 1 --> 3           2 --> 1 --> 3           1 --> 2 --> 3
     '''
-    # The lib name gets clobbered by FFI in Python3 and pypy
-    # The format of the clobbered name doesn't seem to be documented anywhere
-    # and is generated here by visual inspection :-(
-    lib_base = libpath.rsplit('.so', 1)[0]
-    ending = sysconfig.get_config_var('SO')
-    plat_name = get_platform().replace('-', '_')
+    ending = '.so'
+    base = libpath.rsplit(ending, 1)[0]
+    abi = dist_sysconfig.get_config_var('SOABI')
+    if abi != '':
+        abi = '.' + abi
+    else:
+        abi = ''
+    multi_arch = '-' + sys._multiarch
+
     if six.PY2 and sys.subversion[0].lower() == 'pypy':
-        clobbered_path = '%s.%s-26-%s' % (
-            lib_base, sys.subversion[0].lower(), sys._multiarch,
-        ) + ending
-    elif six.PY2:
-        clobbered_path = lib_base + ending
-    elif six.PY3:
-        clobbered_path = lib_base + '.' + plat_name + ending
+        n1 = base + abi + multi_arch + ending
+        n2 = base + abi + ending
+        n3 = libpath
+    else:
+        n1 = base + abi + ending
+        n2 = base + abi + multi_arch + ending
+        n3 = libpath
 
     try:
-        libres = resource_filename(module_name, clobbered_path)
+        libres = resource_filename(module_name, n1)
         return get_lib_ffi_shared(libpath=libres, c_hdr=c_hdr)
     except:
-        # On Py2 we only need to try once
-        if clobbered_path == libpath:
-            raise
-    try:
-        libres = resource_filename(module_name, clobbered_path)
-        return get_lib_ffi_shared(libpath=libres, c_hdr=c_hdr)
-    except:
-        # we need third attempt only on pypy!
-        if six.PY3:
-            raise
-    # if PYPY try ./libpath
-    libres = './' + os.path.basename(clobbered_path)
-    return get_lib_ffi_shared(libpath=libres, c_hdr=c_hdr)
+        try:
+            libres = resource_filename(module_name, n2)
+            return get_lib_ffi_shared(libpath=libres, c_hdr=c_hdr)
+        except:
+            libres = resource_filename(module_name, n3)
+            return get_lib_ffi_shared(libpath=libres, c_hdr=c_hdr)
 
 
 def get_lib_ffi_shared(libpath, c_hdr):
