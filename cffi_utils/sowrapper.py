@@ -22,6 +22,7 @@
 from .ffi import FFIExt
 import six
 import sys
+import os
 from pkg_resources import resource_filename
 from distutils import sysconfig
 from distutils.util import get_platform
