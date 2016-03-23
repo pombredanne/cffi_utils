@@ -36,57 +36,10 @@ def get_lib_ffi_resource(module_name, libpath, c_hdr):
     Use this method when you are loading a package-specific shared library
     If you want to load a system-wide shared library, use get_lib_ffi_shared
     instead
-
-    PEP3140: ABI version tagged .so files:
-        https://www.python.org/dev/peps/pep-3149/
-
-    There's still one unexplained bit: pypy adds '-' + sys._multiarch()
-    at the end (looks like 'x86_64-linux-gnu'), but neither py2 or py3 do
-
-    _I_ think Py2 and Py3 _MAY_ start adding sys._multiarch at some time
-
-    So, we generate three forms:
-        1. With sys._multiarch
-        2. Without sys._multiarch
-        3. libpath as-is
-    For different versions we try these in different orders (for efficiency):
-        Python2                 Python3                 Pypy
-
-        2 --> 1 --> 3           2 --> 1 --> 3           1 --> 2 --> 3
     '''
-    ending = '.so'
-    base = libpath.rsplit(ending, 1)[0]
-    abi = sysconfig.get_config_var('SOABI')
-    if abi is not None:
-        abi = '.' + abi
-    else:
-        abi = ''
-
-    multi_arch = sysconfig.get_config_var('MULTIARCH')
-    if multi_arch is None:
-        multi_arch = ''
-    else:
-        multi_arch = '-' + multi_arch
-
-    if six.PY2 and sys.subversion[0].lower() == 'pypy':
-        n1 = base + abi + multi_arch + ending
-        n2 = base + abi + ending
-        n3 = libpath
-    else:
-        n1 = base + abi + ending
-        n2 = base + abi + multi_arch + ending
-        n3 = libpath
-
-    try:
-        libres = resource_filename(module_name, n1)
-        return get_lib_ffi_shared(libpath=libres, c_hdr=c_hdr)
-    except:
-        try:
-            libres = resource_filename(module_name, n2)
-            return get_lib_ffi_shared(libpath=libres, c_hdr=c_hdr)
-        except:
-            libres = resource_filename(module_name, n3)
-            return get_lib_ffi_shared(libpath=libres, c_hdr=c_hdr)
+    lib = SharedLibWrapper(libpath, c_hdr, module_name=module_name)
+    ffi = lib.ffi
+    return (ffi, lib)
 
 
 def get_lib_ffi_shared(libpath, c_hdr):
@@ -101,7 +54,7 @@ def get_lib_ffi_shared(libpath, c_hdr):
 
 
 class SharedLibWrapper(object):
-    def __init__(self, libpath, c_hdr):
+    def __init__(self, libpath, c_hdr, module_name=None):
         '''
         libpath-->str: library name; can also be full path
         c_hdr-->str: C-style header definitions for functions to wrap
@@ -109,12 +62,81 @@ class SharedLibWrapper(object):
         '''
         self._libpath = libpath
         self._c_hdr = c_hdr
+        self._module_name = module_name
         self.ffi = FFIExt()
 
         self.ffi.cdef(self._c_hdr)
-        self._lib = self.ffi.dlopen(self._libpath)
+        self._lib = None
+        self._libloaded = False
+
+    def __openlib(self):
+        '''
+        Actual (lazy) dlopen() only when an attribute is accessed
+        '''
+        libpath_list = self.__get_libres()
+        for p in libpath_list:
+            try:
+                libres = resource_filename(self._module_name, p)
+                self._lib = self.ffi.dlopen(libres)
+                return
+            except:
+                continue
+        # Just try self._libpath if self._module_name is None
+        # or nothing in libpath_list worked
+        # We set _libloaded so that we do not try more than once
+        self._libloaded = True
+        libres = resource_filename(self._module_name, self._libpath)
+        self._lib = self.ffi.dlopen(libres)
+
+    def __get_libres(self):
+        '''
+        Computes libpath based on whether module_name is set or not
+        Returns-->list of str lib paths to try
+
+        PEP3140: ABI version tagged .so files:
+            https://www.python.org/dev/peps/pep-3149/
+
+        There's still one unexplained bit: pypy adds '-' + sys._multiarch()
+        at the end (looks like 'x86_64-linux-gnu'), but neither py2 or py3 do
+
+        _I_ think Py2 and Py3 _MAY_ start adding sys._multiarch at some time
+
+        So, we generate three forms:
+            1. With sys._multiarch
+            2. Without sys._multiarch
+            3. libpath as-is - always tried by self.__openlib anyway
+        For different versions we try in different order (for efficiency):
+            Python2                 Python3                 Pypy
+
+            2 --> 1 --> 3           2 --> 1 --> 3           1 --> 2 --> 3
+        '''
+        if self._module_name is None:
+            return []
+        ending = '.so'
+        base = self._libpath.rsplit(ending, 1)[0]
+        abi = sysconfig.get_config_var('SOABI')
+        if abi is not None:
+            abi = '.' + abi
+        else:
+            abi = ''
+
+        multi_arch = sysconfig.get_config_var('MULTIARCH')
+        if multi_arch is None:
+            multi_arch = ''
+        else:
+            multi_arch = '-' + multi_arch
+
+        if six.PY2 and sys.subversion[0].lower() == 'pypy':
+            n1 = base + abi + multi_arch + ending
+            n2 = base + abi + ending
+        else:
+            n1 = base + abi + ending
+            n2 = base + abi + multi_arch + ending
+        return [n1, n2]
 
     def __getattr__(self, name):
+        if not self._libloaded:
+            self.__openlib()
         if self._lib is None:
             return self.__getattribute__(name)
         return getattr(self._lib, name)

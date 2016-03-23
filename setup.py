@@ -12,7 +12,7 @@ PACKAGE DATA
 ==============================================================================
 '''
 name = 'cffi_utils'
-version = '0.24'
+version = '0.31'
 packages = find_packages()
 description = 'Utilities to write python wrappers around C code'
 license = (
