@@ -12,7 +12,9 @@ PACKAGE DATA
 ==============================================================================
 '''
 name = 'cffi_utils'
-version = '0.31'
+version = open('ver.txt', 'r').read().splitlines()[0]
+url = 'https://github.com/sundarnagarajan/cffi_utils'
+download_url = '%s/tree/%s' % (url, version)
 packages = find_packages()
 description = 'Utilities to write python wrappers around C code'
 license = (
@@ -22,8 +24,6 @@ license = (
 provides = ['cffi_utils']
 
 long_description = open('README.rst').read()
-url = 'https://github.com/sundarnagarajan/cffi_utils'
-download_url = 'https://github.com/sundarnagarajan/cffi_utils.git'
 author = 'Sundar Nagarajan'
 author_email = ''
 maintainer = author
