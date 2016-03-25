@@ -2,23 +2,20 @@
 Utility functions to locate and load shared libraries
 
 ### DESCRIPTION
-	    Recommended usage:
+Recommended usage:
 	    
-	    Should only need to use get_lib_ffi_shared() or get_lib_ffi_resource()
+Should only need to use get_lib_ffi_shared() or get_lib_ffi_resource()
 	    
-	    Use get_lib_ffi_shared to load a system-wide shared library with a known
-	    library filename and / or path
+Use get_lib_ffi_shared to load a system-wide shared library with a known library filename and / or path
 	    
-	    Use get_lib_ffi_resource to load a module-specific shared library where
-	    library filename _MAY_ be mangled as per PEP3149 and path _MAY_ need to
-	    be looked up using pkg_resources. Internally, get_lib_ffi_resource()
-	    calls get_lib_ffi_shared()
+Use get_lib_ffi_resource to load a module-specific shared library where library filename _MAY_ be mangled as per PEP3149 and path _MAY_ need to be looked up using pkg_resources. Internally, get_lib_ffi_resource() calls get_lib_ffi_shared()
 	    
-	    Both return a tuple: (ffi, lib):
-		ffi-->FFIExt - should behave like cffi.FFI with some additional
-			utility methods
-		lib-->SharedLibWrapper instance - use methods on this object to
-		    call methods in the shared library
+Both return a tuple: (ffi, lib):
+
+	ffi-->FFIExt - should behave like cffi.FFI with some additional
+		utility methods
+	lib-->SharedLibWrapper instance - use methods on this object to
+		call methods in the shared library
 
 ### CLASSES
 	    class SharedLibWrapper(__builtin__.object)
@@ -86,44 +83,44 @@ Utility functions for Py2/Py3 compatibility
 
 ### FUNCTIONS
 
-  chr(x)
+	chr(x)
 		x-->int / byte
 		Returns-->byte / str of length 1
 		    Behaves like PY2 chr() in PY2 or PY3
 	    
-  decode(b, encoding='latin-1')
+	decode(b, encoding='latin-1')
 		b-->bytes
 		encoding-->str: encoding to use. Recommended to use default
 		Returns-->str: b decoded to str using encoding
 		    Works in PY2, PY3
 	    
-  encode(s, encoding='latin-1')
+	encode(s, encoding='latin-1')
 		s-->str
 		encoding-->str: encoding to use. Recommended to use default
 		Returns-->bytes: s encoded to bytes using encoding
 		    Works in PY2, PY3
 	    
-  fromBytes(b)
+	fromBytes(b)
 		s-->bytes (or str)
 		Returns-->str (works in PY2, PY3)
 	    
-  inputFromBytes(func, *args, **kwargs)
+	inputFromBytes(func, *args, **kwargs)
 		Descriptor that converts all arguments to str
 	    
-  inputToBytes(func, *args, **kwargs)
+	inputToBytes(func, *args, **kwargs)
 		Descriptor that converts all arguments to bytes
 	    
-  ord(x)
+	ord(x)
 		x-->int / byte
 		Returns-->int
 		    Behaves like PY2 ord() in PY2 or PY3
 	    
-  outputFromBytes(func, *args, **kwargs)
+	outputFromBytes(func, *args, **kwargs)
 		Descriptor that converts all return values to str
 	    
-  outputToBytes(func, *args, **kwargs)
+	outputToBytes(func, *args, **kwargs)
 		Descriptor that converts all return values to bytes
 	    
-  toBytes(s)
+	toBytes(s)
 		s-->str (or bytes)
 		Returns-->bytes (works in PY2, PY3)
