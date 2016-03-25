@@ -1,7 +1,7 @@
 # cffi_utils.sowrapper - sowrapper
 Utility functions to locate and load shared libraries
 
-## DESCRIPTION
+### DESCRIPTION
 	    Recommended usage:
 	    
 	    Should only need to use get_lib_ffi_shared() or get_lib_ffi_resource()
@@ -20,7 +20,7 @@ Utility functions to locate and load shared libraries
 		lib-->SharedLibWrapper instance - use methods on this object to
 		    call methods in the shared library
 
-## CLASSES
+### CLASSES
 	    class SharedLibWrapper(__builtin__.object)
 	     |  Methods defined here:
 	     |  
@@ -29,7 +29,7 @@ Utility functions to locate and load shared libraries
 	     |      c_hdr-->str: C-style header definitions for functions to wrap
 	     |      ffi-->FFIExt or cffi.FFI
 
-## FUNCTIONS
+### FUNCTIONS
 	get_lib_ffi_resource(module_name, libpath, c_hdr)
 		module_name-->str: module name to retrieve resource
 		libpath-->str: shared library filename with optional path
