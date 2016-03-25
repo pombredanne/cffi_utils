@@ -12,7 +12,7 @@ PACKAGE DATA
 ==============================================================================
 '''
 name = 'cffi_utils'
-version = open('ver.txt', 'r').read().splitlines()[0]
+version = '0.34'   # oldver: open('ver.txt', 'r').read().splitlines()[0]
 url = 'https://github.com/sundarnagarajan/cffi_utils'
 download_url = '%s/tree/%s' % (url, version)
 packages = find_packages()
