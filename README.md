@@ -1,4 +1,5 @@
-# cffi_utils.sowrapper - sowrapper: Utility functions to locate and load shared libraries
+# cffi_utils.sowrapper - sowrapper
+Utility functions to locate and load shared libraries
 
 ## DESCRIPTION
 	    Recommended usage:
@@ -44,7 +45,8 @@
 		c_hdr-->str: C-style header definitions for functions to wrap
 		Returns-->(ffi, lib)
 
-# cffi_utils.ffi - ffi.py: wrapper around cffi.FFI
+# cffi_utils.ffi
+Extension of cffi.FFI adding a few utility methods
 
 ## CLASSES
 	    class FFIExt(cffi.api.FFI)
@@ -79,7 +81,8 @@
 	     |  get_extension(self)
 
 
-# cffi_utils.utils2to3 - utils2to3: Utility functions for Py2/Py3 compatibility
+# cffi_utils.utils2to3
+Utility functions for Py2/Py3 compatibility
 
 ## FUNCTIONS
   chr(x)
