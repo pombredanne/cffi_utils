@@ -1,107 +1,125 @@
-# cffi_utils: Utilities to write python wrappers around C code
+# cffi_utils.sowrapper - sowrapper: Utility functions to locate and load shared libraries
 
-## cffi_utils.sowrapper:
+## DESCRIPTION
+	    Recommended usage:
+	    
+	    Should only need to use get_lib_ffi_shared() or get_lib_ffi_resource()
+	    
+	    Use get_lib_ffi_shared to load a system-wide shared library with a known
+	    library filename and / or path
+	    
+	    Use get_lib_ffi_resource to load a module-specific shared library where
+	    library filename _MAY_ be mangled as per PEP3149 and path _MAY_ need to
+	    be looked up using pkg_resources. Internally, get_lib_ffi_resource()
+	    calls get_lib_ffi_shared()
+	    
+	    Both return a tuple: (ffi, lib):
+		ffi-->FFIExt - should behave like cffi.FFI with some additional
+			utility methods
+		lib-->SharedLibWrapper instance - use methods on this object to
+		    call methods in the shared library
 
-  get_lib_ffi_resource(module_name, libpath, c_hdr)
-    module_name-->str: module name to retrieve resource
-    libpath-->str: shared library filename with optional path
-    c_hdr-->str: C-style header definitions for functions to wrap
-    Returns-->(ffi, lib)
-    
-    The 'clobbered' paths are tried FIRST, falling back to trying the
-        unchanged libpath
-    For generating the 'clobbered' filenames,libpath has to end in '.so'
-    
-    Use this method when you are loading a package-specific shared library
-    If you want to load a system-wide shared library, use get_lib_ffi_shared
-    instead
+## CLASSES
+	    class SharedLibWrapper(__builtin__.object)
+	     |  Methods defined here:
+	     |  
+	     |  __init__(self, libpath, c_hdr, module_name=None)
+	     |      libpath-->str: library name; can also be full path
+	     |      c_hdr-->str: C-style header definitions for functions to wrap
+	     |      ffi-->FFIExt or cffi.FFI
 
-  get_lib_ffi_shared(libpath, c_hdr)
-    libpath-->str: shared library filename with optional path
-    c_hdr-->str: C-style header definitions for functions to wrap
-    Returns-->(ffi, lib)
+## FUNCTIONS
+	get_lib_ffi_resource(module_name, libpath, c_hdr)
+		module_name-->str: module name to retrieve resource
+		libpath-->str: shared library filename with optional path
+		c_hdr-->str: C-style header definitions for functions to wrap
+		Returns-->(ffi, lib)
+		
+		Use this method when you are loading a package-specific shared library
+		If you want to load a system-wide shared library, use get_lib_ffi_shared
+		instead
+	    
+	get_lib_ffi_shared(libpath, c_hdr)
+		libpath-->str: shared library filename with optional path
+		c_hdr-->str: C-style header definitions for functions to wrap
+		Returns-->(ffi, lib)
+
+# cffi_utils.ffi - ffi.py: wrapper around cffi.FFI
+
+## CLASSES
+	    class FFIExt(cffi.api.FFI)
+	     |  FFIExt is an extension of cffi.FFI, adding a few utility methods
+	     |  
+	     |  get_cdata(), get_buffer() and get_bytes() all operate on a variable
+	     |  list of arguments as a convenience.
+	     |  
+	     |  Otherwise, get_cdata() and get_buffer() are equivalent to
+	     |  FFI.from_buffer() and FFI.buffer() respectively
+	     |  
+	     |  get_bytes() is identical to get_buffer() except that outputs are
+	     |  converted to bytes
+	     |  
+	     |  get_buffer(self, *args)
+	     |      all args-->_cffi_backend.CDataOwn
+	     |      Must be a pointer or an array
+	     |      Returns-->buffer (if a SINGLE argument was provided)
+	     |                LIST of buffer (if a args was a tuple or list)
+	     |  
+	     |  get_bytes(self, *args)
+	     |      all args-->_cffi_backend.CDataOwn
+	     |      Must be a pointer or an array
+	     |      Returns-->bytes (if a SINGLE argument was provided)
+	     |                LIST of bytes (if a args was a tuple or list)
+	     |  
+	     |  get_cdata(self, *args)
+	     |      all args-->_cffi_backend.buffer
+	     |      Returns-->cdata (if a SINGLE argument was provided)
+	     |                LIST of cdata (if a args was a tuple or list)
+	     |  
+	     |  get_extension(self)
 
 
+# cffi_utils.utils2to3 - utils2to3: Utility functions for Py2/Py3 compatibility
 
-## cffi_utils.ffi:
-
-  class FFIExt(cffi.api.FFI)
-    get_buffer(self, *args)
-        all args-->_cffi_backend.CDataOwn
-        Must be a pointer or an array
-        Returns-->buffer (if a SINGLE argument was provided)
-              LIST of buffer (if a args was a tuple or list)
-
-    get_bytes(self, *args)
-        all args-->_cffi_backend.CDataOwn
-        Must be a pointer or an array
-        Returns-->bytes (if a SINGLE argument was provided)
-              LIST of bytes (if a args was a tuple or list)
-
-    get_cdata(self, *args)
-        all args-->_cffi_backend.buffer
-        Returns-->cdata (if a SINGLE argument was provided)
-              LIST of cdata (if a args was a tuple or list)
-
-
-
-cffi_utils.utils2to3:
----------------------
-
-  toBytes(s)
-    s-->str / bytes
-    Returns-->bytes (Py2/3 compatible)
-
-  fromBytes(b)
-    b-->bytes / str
-    Returns-->str (Py2/3 compatible)
-
+## FUNCTIONS
   chr(x)
-    Returns-->str (Py2/3 compatible)
-    
-  ord(x)
-    Returns-->int (Py2/3 compatible)
-
-  decode(s, encoding='latin-1')
-  
+		x-->int / byte
+		Returns-->byte / str of length 1
+		    Behaves like PY2 chr() in PY2 or PY3
+	    
+  decode(b, encoding='latin-1')
+		b-->bytes
+		encoding-->str: encoding to use. Recommended to use default
+		Returns-->str: b decoded to str using encoding
+		    Works in PY2, PY3
+	    
   encode(s, encoding='latin-1')
-
-
-Function decorators - converts all inputs / outputs
-    inputFromBytes(func, *args, **kwargs)
-    inputToBytes(func, *args, **kwargs)
-    outputFromBytes(func, *args, **kwargs)
-    outputToBytes(func, *args, **kwargs)
-    
-
-# LICENSE:
-
-Licensed under the GPL version 3 or later. See LICENSE-GPL-v3.txt
-
-
-# EXAMPLES:
-
-See the following projects for examples where I have used this:
-
-  https://github.com/sundarnagarajan/py_poly1305aes/blob/master/poly1305_aes/poly1305.py
-
-  https://github.com/sundarnagarajan/py_poly1305-donna/blob/master/poly1305_donna/poly1305.py
-
-# INSTALLATION:
-
-Using pip from pypi:
-    pip install cffi_utils
-
-Using pip from git:
-    pip install 'git+https://github.com/sundarnagarajan/cffi_utils.git'
-
-Using setup.py:
-    python setup.py install
-
-# BUILD / INSTALL REQUIREMENTS:
-
-*GNU/Linux:*
-- Python
-  Tested on 2.7.6, 3.4.3, pypy 2.7.10 (pypy 4.0.1)
-- cffi >= 1.0.0
-- six
+		s-->str
+		encoding-->str: encoding to use. Recommended to use default
+		Returns-->bytes: s encoded to bytes using encoding
+		    Works in PY2, PY3
+	    
+  fromBytes(b)
+		s-->bytes (or str)
+		Returns-->str (works in PY2, PY3)
+	    
+  inputFromBytes(func, *args, **kwargs)
+		Descriptor that converts all arguments to str
+	    
+  inputToBytes(func, *args, **kwargs)
+		Descriptor that converts all arguments to bytes
+	    
+  ord(x)
+		x-->int / byte
+		Returns-->int
+		    Behaves like PY2 ord() in PY2 or PY3
+	    
+  outputFromBytes(func, *args, **kwargs)
+		Descriptor that converts all return values to str
+	    
+  outputToBytes(func, *args, **kwargs)
+		Descriptor that converts all return values to bytes
+	    
+  toBytes(s)
+		s-->str (or bytes)
+		Returns-->bytes (works in PY2, PY3)
