@@ -23,6 +23,18 @@ from cffi import FFI
 
 
 class FFIExt(FFI):
+    '''
+    FFIExt is an extension of cffi.FFI, adding a few utility methods
+
+    get_cdata(), get_buffer() and get_bytes() all operate on a variable
+    list of arguments as a convenience.
+
+    Otherwise, get_cdata() and get_buffer() are equivalent to
+    FFI.from_buffer() and FFI.buffer() respectively
+
+    get_bytes() is identical to get_buffer() except that outputs are
+    converted to bytes
+    '''
     def get_cdata(self, *args):
         '''
         all args-->_cffi_backend.buffer

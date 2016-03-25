@@ -33,6 +33,10 @@ elif six.PY2:
 
 
 def toBytes(s):
+    '''
+    s-->str (or bytes)
+    Returns-->bytes (works in PY2, PY3)
+    '''
     if six.PY3:
         if isinstance(s, bytes):
             return s
@@ -48,6 +52,10 @@ def toBytes(s):
 
 
 def fromBytes(b):
+    '''
+    s-->bytes (or str)
+    Returns-->str (works in PY2, PY3)
+    '''
     if six.PY3:
         if isinstance(b, bytes):
             return decode(b, 'latin-1')
@@ -65,6 +73,12 @@ def fromBytes(b):
 
 
 def encode(s, encoding='latin-1'):
+    '''
+    s-->str
+    encoding-->str: encoding to use. Recommended to use default
+    Returns-->bytes: s encoded to bytes using encoding
+        Works in PY2, PY3
+    '''
     if six.PY3:
         import codecs
         if isinstance(s, str):
@@ -78,23 +92,32 @@ def encode(s, encoding='latin-1'):
             return toBytes(fromBytes(s).encode(encoding=encoding))
 
 
-def decode(s, encoding='latin-1'):
+def decode(b, encoding='latin-1'):
+    '''
+    b-->bytes
+    encoding-->str: encoding to use. Recommended to use default
+    Returns-->str: b decoded to str using encoding
+        Works in PY2, PY3
+    '''
     if six.PY3:
         import codecs
-        return codecs.decode(s, encoding)
+        return codecs.decode(b, encoding)
     elif six.PY2:
-        if isinstance(s, str):
-            print('decode: got string')
-            return s.decode(encoding=encoding)
-        elif isinstance(s, bytearray):
-            print('decode: got bytearray')
-            return toBytes(fromBytes(s).decode(encoding=encoding))
+        if isinstance(b, str):
+            return b.decode(encoding=encoding)
+        elif isinstance(b, bytearray):
+            return toBytes(fromBytes(b).decode(encoding=encoding))
 
 _chr = chr
 _ord = ord
 
 
 def chr(x):
+    '''
+    x-->int / byte
+    Returns-->byte / str of length 1
+        Behaves like PY2 chr() in PY2 or PY3
+    '''
     global _chr
     if isinstance(x, int):
         return toBytes(_chr(x))
@@ -103,6 +126,11 @@ def chr(x):
 
 
 def ord(x):
+    '''
+    x-->int / byte
+    Returns-->int
+        Behaves like PY2 ord() in PY2 or PY3
+    '''
     global _ord
     if isinstance(x, int):
         return x
@@ -154,16 +182,28 @@ def _convResults(func, f, *args, **kwargs):
 
 
 def inputFromBytes(func, *args, **kwargs):
+    '''
+    Descriptor that converts all arguments to str
+    '''
     return _convInputs(func, _convFromBytes, *args, **kwargs)
 
 
 def inputToBytes(func, *args, **kwargs):
+    '''
+    Descriptor that converts all arguments to bytes
+    '''
     return _convInputs(func, _convToBytes, *args, **kwargs)
 
 
 def outputToBytes(func, *args, **kwargs):
+    '''
+    Descriptor that converts all return values to bytes
+    '''
     return _convResults(func, _convToBytes, *args, **kwargs)
 
 
 def outputFromBytes(func, *args, **kwargs):
+    '''
+    Descriptor that converts all return values to str
+    '''
     return _convResults(func, _convFromBytes, *args, **kwargs)

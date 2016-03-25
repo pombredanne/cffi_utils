@@ -18,6 +18,24 @@
 
     For details of the GNU General Pulic License version 3, see the
     LICENSE.txt file that accompanied this program
+
+    Recommended usage:
+
+    Should only need to use get_lib_ffi_shared() or get_lib_ffi_resource()
+
+    Use get_lib_ffi_shared to load a system-wide shared library with a known
+    library filename and / or path
+
+    Use get_lib_ffi_resource to load a module-specific shared library where
+    library filename _MAY_ be mangled as per PEP3149 and path _MAY_ need to
+    be looked up using pkg_resources. Internally, get_lib_ffi_resource()
+    calls get_lib_ffi_shared()
+
+    Both return a tuple: (ffi, lib):
+        ffi-->FFIExt - should behave like cffi.FFI with some additional
+                utility methods
+        lib-->SharedLibWrapper instance - use methods on this object to
+            call methods in the shared library
 '''
 from .ffi import FFIExt
 import six
