@@ -1,9 +1,6 @@
-============================================================
-cffi_utils: Utilities to write python wrappers around C code
-============================================================
+# cffi_utils: Utilities to write python wrappers around C code
 
-cffi_utils.sowrapper:
----------------------
+## cffi_utils.sowrapper:
 
 get_lib_ffi_resource(module_name, libpath, c_hdr)
     module_name-->str: module name to retrieve resource
@@ -26,8 +23,7 @@ get_lib_ffi_shared(libpath, c_hdr)
 
 
 
-cffi_utils.ffi:
----------------
+## cffi_utils.ffi:
 
 class FFIExt(cffi.api.FFI)
 get_buffer(self, *args)
@@ -76,12 +72,12 @@ Function decorators - converts all inputs / outputs
     outputToBytes(func, *args, **kwargs)
     
 
-LICENSE:
---------
+# LICENSE:
+
 Licensed under the GPL version 3 or later. See LICENSE-GPL-v3.txt
 
 
-**EXAMPLES:**
+# EXAMPLES:
 
 See the following projects for examples where I have used this:
 
@@ -89,7 +85,7 @@ See the following projects for examples where I have used this:
 
   https://github.com/sundarnagarajan/py_poly1305-donna/blob/master/poly1305_donna/poly1305.py
 
-**INSTALLATION:**
+# INSTALLATION:
 
 Using pip from pypi:
     pip install cffi_utils
@@ -100,7 +96,7 @@ Using pip from git:
 Using setup.py:
     python setup.py install
 
-**BUILD / INSTALL REQUIREMENTS:**
+# BUILD / INSTALL REQUIREMENTS:
 
 *GNU/Linux:*
 - Python
