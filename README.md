@@ -2,7 +2,7 @@
 
 ## cffi_utils.sowrapper:
 
-get_lib_ffi_resource(module_name, libpath, c_hdr)
+  get_lib_ffi_resource(module_name, libpath, c_hdr)
     module_name-->str: module name to retrieve resource
     libpath-->str: shared library filename with optional path
     c_hdr-->str: C-style header definitions for functions to wrap
@@ -16,7 +16,7 @@ get_lib_ffi_resource(module_name, libpath, c_hdr)
     If you want to load a system-wide shared library, use get_lib_ffi_shared
     instead
 
-get_lib_ffi_shared(libpath, c_hdr)
+  get_lib_ffi_shared(libpath, c_hdr)
     libpath-->str: shared library filename with optional path
     c_hdr-->str: C-style header definitions for functions to wrap
     Returns-->(ffi, lib)
@@ -25,44 +25,46 @@ get_lib_ffi_shared(libpath, c_hdr)
 
 ## cffi_utils.ffi:
 
-class FFIExt(cffi.api.FFI)
-get_buffer(self, *args)
-    all args-->_cffi_backend.CDataOwn
-    Must be a pointer or an array
-    Returns-->buffer (if a SINGLE argument was provided)
-          LIST of buffer (if a args was a tuple or list)
+  class FFIExt(cffi.api.FFI)
+    get_buffer(self, *args)
+        all args-->_cffi_backend.CDataOwn
+        Must be a pointer or an array
+        Returns-->buffer (if a SINGLE argument was provided)
+              LIST of buffer (if a args was a tuple or list)
 
-get_bytes(self, *args)
-    all args-->_cffi_backend.CDataOwn
-    Must be a pointer or an array
-    Returns-->bytes (if a SINGLE argument was provided)
-          LIST of bytes (if a args was a tuple or list)
+    get_bytes(self, *args)
+        all args-->_cffi_backend.CDataOwn
+        Must be a pointer or an array
+        Returns-->bytes (if a SINGLE argument was provided)
+              LIST of bytes (if a args was a tuple or list)
 
-get_cdata(self, *args)
-    all args-->_cffi_backend.buffer
-    Returns-->cdata (if a SINGLE argument was provided)
-          LIST of cdata (if a args was a tuple or list)
+    get_cdata(self, *args)
+        all args-->_cffi_backend.buffer
+        Returns-->cdata (if a SINGLE argument was provided)
+              LIST of cdata (if a args was a tuple or list)
 
 
 
 cffi_utils.utils2to3:
 ---------------------
 
-toBytes(s)
+  toBytes(s)
     s-->str / bytes
     Returns-->bytes (Py2/3 compatible)
 
-fromBytes(b)
+  fromBytes(b)
     b-->bytes / str
     Returns-->str (Py2/3 compatible)
 
-chr(x)
+  chr(x)
     Returns-->str (Py2/3 compatible)
-ord(x)
+    
+  ord(x)
     Returns-->int (Py2/3 compatible)
 
-decode(s, encoding='latin-1')
-encode(s, encoding='latin-1')
+  decode(s, encoding='latin-1')
+  
+  encode(s, encoding='latin-1')
 
 
 Function decorators - converts all inputs / outputs
