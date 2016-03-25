@@ -48,7 +48,7 @@ Utility functions to locate and load shared libraries
 # cffi_utils.ffi
 Extension of cffi.FFI adding a few utility methods
 
-## CLASSES
+### CLASSES
 	    class FFIExt(cffi.api.FFI)
 	     |  FFIExt is an extension of cffi.FFI, adding a few utility methods
 	     |  
@@ -84,7 +84,8 @@ Extension of cffi.FFI adding a few utility methods
 # cffi_utils.utils2to3
 Utility functions for Py2/Py3 compatibility
 
-## FUNCTIONS
+### FUNCTIONS
+
   chr(x)
 		x-->int / byte
 		Returns-->byte / str of length 1
