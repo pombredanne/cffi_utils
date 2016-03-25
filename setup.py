@@ -12,7 +12,7 @@ PACKAGE DATA
 ==============================================================================
 '''
 name = 'cffi_utils'
-version = '0.36'   # oldver: '0.35.1'
+version = '0.37'   # oldver: '0.36'
 url = 'https://github.com/sundarnagarajan/cffi_utils'
 download_url = '%s/tree/%s' % (url, version)
 packages = find_packages()
@@ -24,7 +24,7 @@ license = (
 provides = ['cffi_utils']
 
 try:
-    long_description = open('README_generated.rst').read()
+    long_description = open('README.rst').read()
 except:
     long_description = description
 author = 'Sundar Nagarajan'
