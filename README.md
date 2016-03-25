@@ -1,4 +1,4 @@
-# cffi_utils.sowrapper - sowrapper
+# Module cffi_utils.sowrapper
 Utility functions to locate and load shared libraries
 
 ### DESCRIPTION
@@ -42,7 +42,7 @@ Both return a tuple: (ffi, lib):
 		c_hdr-->str: C-style header definitions for functions to wrap
 		Returns-->(ffi, lib)
 
-# cffi_utils.ffi
+# Module cffi_utils.ffi
 Extension of cffi.FFI adding a few utility methods
 
 ### CLASSES
@@ -78,7 +78,7 @@ Extension of cffi.FFI adding a few utility methods
 	     |  get_extension(self)
 
 
-# cffi_utils.utils2to3
+# Module cffi_utils.utils2to3
 Utility functions for Py2/Py3 compatibility
 
 ### FUNCTIONS
