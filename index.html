@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="UTF-8">
+    <title>Cffi utils by sundarnagarajan</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
+  </head>
+  <body>
+    <section class="page-header">
+      <h1 class="project-name">Cffi utils</h1>
+      <h2 class="project-tagline">Utility modules to build python wrappers around C code</h2>
+      <a href="https://github.com/sundarnagarajan/cffi_utils" class="btn">View on GitHub</a>
+      <a href="https://github.com/sundarnagarajan/cffi_utils/zipball/master" class="btn">Download .zip</a>
+      <a href="https://github.com/sundarnagarajan/cffi_utils/tarball/master" class="btn">Download .tar.gz</a>
+    </section>
+
+    <section class="main-content">
+      <h1>
+<a id="module-cffi_utilssowrapper" class="anchor" href="#module-cffi_utilssowrapper" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Module cffi_utils.sowrapper</h1>
+
+<p>Utility functions to locate and load shared libraries</p>
+
+<h3>
+<a id="description" class="anchor" href="#description" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>DESCRIPTION</h3>
+
+<p>Recommended usage:</p>
+
+<p>Should only need to use get_lib_ffi_shared() or get_lib_ffi_resource()</p>
+
+<p>Use get_lib_ffi_shared to load a system-wide shared library with a known library filename and / or path</p>
+
+<p>Use get_lib_ffi_resource to load a module-specific shared library where library filename <em>MAY</em> be mangled as per PEP3149 and path <em>MAY</em> need to be looked up using pkg_resources. Internally, get_lib_ffi_resource() calls get_lib_ffi_shared()</p>
+
+<p>Both return a tuple: (ffi, lib):</p>
+
+<pre><code>ffi--&gt;FFIExt - should behave like cffi.FFI with some additional
+    utility methods
+lib--&gt;SharedLibWrapper instance - use methods on this object to
+    call methods in the shared library
+</code></pre>
+
+<h3>
+<a id="classes" class="anchor" href="#classes" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>CLASSES</h3>
+
+<pre><code>    class SharedLibWrapper(__builtin__.object)
+     |  Methods defined here:
+     |  
+     |  __init__(self, libpath, c_hdr, module_name=None)
+     |      libpath--&gt;str: library name; can also be full path
+     |      c_hdr--&gt;str: C-style header definitions for functions to wrap
+     |      ffi--&gt;FFIExt or cffi.FFI
+</code></pre>
+
+<h3>
+<a id="functions" class="anchor" href="#functions" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>FUNCTIONS</h3>
+
+<pre><code>get_lib_ffi_resource(module_name, libpath, c_hdr)
+    module_name--&gt;str: module name to retrieve resource
+    libpath--&gt;str: shared library filename with optional path
+    c_hdr--&gt;str: C-style header definitions for functions to wrap
+    Returns--&gt;(ffi, lib)
+
+    Use this method when you are loading a package-specific shared library
+    If you want to load a system-wide shared library, use get_lib_ffi_shared
+    instead
+
+get_lib_ffi_shared(libpath, c_hdr)
+    libpath--&gt;str: shared library filename with optional path
+    c_hdr--&gt;str: C-style header definitions for functions to wrap
+    Returns--&gt;(ffi, lib)
+</code></pre>
+
+<h1>
+<a id="module-cffi_utilsffi" class="anchor" href="#module-cffi_utilsffi" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Module cffi_utils.ffi</h1>
+
+<p>Extension of cffi.FFI adding a few utility methods</p>
+
+<h3>
+<a id="classes-1" class="anchor" href="#classes-1" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>CLASSES</h3>
+
+<pre><code>    class FFIExt(cffi.api.FFI)
+     |  FFIExt is an extension of cffi.FFI, adding a few utility methods
+     |  
+     |  get_cdata(), get_buffer() and get_bytes() all operate on a variable
+     |  list of arguments as a convenience.
+     |  
+     |  Otherwise, get_cdata() and get_buffer() are equivalent to
+     |  FFI.from_buffer() and FFI.buffer() respectively
+     |  
+     |  get_bytes() is identical to get_buffer() except that outputs are
+     |  converted to bytes
+     |  
+     |  get_buffer(self, *args)
+     |      all args--&gt;_cffi_backend.CDataOwn
+     |      Must be a pointer or an array
+     |      Returns--&gt;buffer (if a SINGLE argument was provided)
+     |                LIST of buffer (if a args was a tuple or list)
+     |  
+     |  get_bytes(self, *args)
+     |      all args--&gt;_cffi_backend.CDataOwn
+     |      Must be a pointer or an array
+     |      Returns--&gt;bytes (if a SINGLE argument was provided)
+     |                LIST of bytes (if a args was a tuple or list)
+     |  
+     |  get_cdata(self, *args)
+     |      all args--&gt;_cffi_backend.buffer
+     |      Returns--&gt;cdata (if a SINGLE argument was provided)
+     |                LIST of cdata (if a args was a tuple or list)
+     |  
+     |  get_extension(self)
+</code></pre>
+
+<h1>
+<a id="module-cffi_utilsutils2to3" class="anchor" href="#module-cffi_utilsutils2to3" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Module cffi_utils.utils2to3</h1>
+
+<p>Utility functions for Py2/Py3 compatibility</p>
+
+<h3>
+<a id="functions-1" class="anchor" href="#functions-1" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>FUNCTIONS</h3>
+
+<pre><code>chr(x)
+    x--&gt;int / byte
+    Returns--&gt;byte / str of length 1
+        Behaves like PY2 chr() in PY2 or PY3
+
+decode(b, encoding='latin-1')
+    b--&gt;bytes
+    encoding--&gt;str: encoding to use. Recommended to use default
+    Returns--&gt;str: b decoded to str using encoding
+        Works in PY2, PY3
+
+encode(s, encoding='latin-1')
+    s--&gt;str
+    encoding--&gt;str: encoding to use. Recommended to use default
+    Returns--&gt;bytes: s encoded to bytes using encoding
+        Works in PY2, PY3
+
+fromBytes(b)
+    s--&gt;bytes (or str)
+    Returns--&gt;str (works in PY2, PY3)
+
+inputFromBytes(func, *args, **kwargs)
+    Descriptor that converts all arguments to str
+
+inputToBytes(func, *args, **kwargs)
+    Descriptor that converts all arguments to bytes
+
+ord(x)
+    x--&gt;int / byte
+    Returns--&gt;int
+        Behaves like PY2 ord() in PY2 or PY3
+
+outputFromBytes(func, *args, **kwargs)
+    Descriptor that converts all return values to str
+
+outputToBytes(func, *args, **kwargs)
+    Descriptor that converts all return values to bytes
+
+toBytes(s)
+    s--&gt;str (or bytes)
+    Returns--&gt;bytes (works in PY2, PY3)
+</code></pre>
+
+      <footer class="site-footer">
+        <span class="site-footer-owner"><a href="https://github.com/sundarnagarajan/cffi_utils">Cffi utils</a> is maintained by <a href="https://github.com/sundarnagarajan">sundarnagarajan</a>.</span>
+
+        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
+      </footer>
+
+    </section>
+
+  
+  </body>
+</html>
