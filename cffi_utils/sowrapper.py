@@ -117,6 +117,12 @@ class SharedLibWrapper(object):
         There's still one unexplained bit: pypy adds '-' + sys._multiarch()
         at the end (looks like 'x86_64-linux-gnu'), but neither py2 or py3 do
 
+        Additionally, in older releases of pypy (e.g. build f3ad1e1e1d62
+        Aug-28-2015), sysconfig.get_config_var('SOABI') returns '' but
+        shared library still has '.pypy-26' in the name!
+
+        So for pypy we try this this variant anyway!
+
         _I_ think Py2 and Py3 _MAY_ start adding sys._multiarch at some time
 
         So, we generate three forms:
@@ -150,7 +156,11 @@ class SharedLibWrapper(object):
         else:
             n1 = base + abi + ending
             n2 = base + abi + multi_arch + ending
-        return [n1, n2]
+        if six.PY2 and sys.subversion[0].lower() == 'pypy':
+            n3 = base + '.pypy-26' + ending
+            return [n1, n2, n3]
+        else:
+            return [n1, n2]
 
     def __getattr__(self, name):
         if not self._libloaded:
