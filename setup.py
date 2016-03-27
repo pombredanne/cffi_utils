@@ -1,6 +1,6 @@
 import sys
 import os
-from setuptools import setup, find_packages
+from setuptools import setup, find_packages, Extension
 
 
 os.chdir(os.path.dirname(sys.argv[0]) or ".")
@@ -12,7 +12,7 @@ PACKAGE DATA
 ==============================================================================
 '''
 name = 'cffi_utils'
-version = '0.38'   # oldver: '0.37'
+version = '0.39'   # oldver: '0.38'
 url = 'https://github.com/sundarnagarajan/cffi_utils'
 download_url = '%s/tree/%s' % (url, version)
 packages = find_packages()
@@ -72,6 +72,15 @@ ADDL_KWARGS = dict(
 '''
 
 
+def prepare_c_source(cmd):
+    '''
+    cmd-->str: command with arguments
+    '''
+    import setupext
+    setupext.config['build_ext']['pre']['cmdlist'] = [cmd]
+    return setupext.get_cmdclass()
+
+
 def get_longdesc(default=''):
     '''
     Returns-->str
@@ -126,7 +135,7 @@ long_description = get_longdesc(description)
 known_keywords = [
     'name', 'version', 'packages', 'description', 'license',
     'install_requires', 'requires', 'setup_requires',
-    'ext_modules', 'package_dir', 'package_data',
+    'package_dir', 'package_data',
     'zip_safe', 'classifiers', 'keywords',
     'long_description', 'url', 'download_url',
     'author', 'author_email', 'maintainer', 'maintainer_email',
@@ -137,8 +146,15 @@ for k in known_keywords:
     if k in locals():
         kwdict[k] = locals()[k]
 
+if 'prep_cmd' in locals():
+    kwdict['cmdclass'] = prepare_c_source(locals()['prep_cmd'])
+
+# Do not compile ext_modules during build phase - wasteful
+if len(sys.argv) > 1 and sys.argv[1] != 'build':
+    if 'ext_modules' in locals():
+        kwdict['ext_modules'] = [Extension(**x) for x in
+                                 locals()['ext_modules']]
+
 # Additional keywords specified by user - shouldn't be required, normally
 kwdict.update(ADDL_KWARGS)
-
-
 setup(**kwdict)
