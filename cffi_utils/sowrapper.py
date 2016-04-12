@@ -37,11 +37,10 @@
         lib-->SharedLibWrapper instance - use methods on this object to
             call methods in the shared library
 '''
-from .ffi import FFIExt
-import six
-import sys
 from pkg_resources import resource_filename
 import sysconfig
+from .utils2to3 import PYPY
+from .ffi import FFIExt
 
 
 def get_lib_ffi_resource(module_name, libpath, c_hdr):
@@ -150,13 +149,13 @@ class SharedLibWrapper(object):
         else:
             multi_arch = '-' + multi_arch
 
-        if six.PY2 and sys.subversion[0].lower() == 'pypy':
+        if PYPY:
             n1 = base + abi + multi_arch + ending
             n2 = base + abi + ending
         else:
             n1 = base + abi + ending
             n2 = base + abi + multi_arch + ending
-        if six.PY2 and sys.subversion[0].lower() == 'pypy':
+        if PYPY:
             n3 = base + '.pypy-26' + ending
             return [n1, n2, n3]
         else:

@@ -29,7 +29,6 @@ maintainer = author
 maintainer_email = author_email
 install_requires = [
     'cffi>=1.0.0',
-    'six>=1.9.0'
 ],
 maintainer = author
 maintainer_email = author_email

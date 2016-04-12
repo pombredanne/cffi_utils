@@ -28,11 +28,14 @@ import codecs
 DEF_ENCODING = 'latin-1'
 PY_VER = sys.version_info[0]
 (PY2, PY3) = (PY_VER == 2, PY_VER == 3)
+PYPY = (PY2 and sys.subversion[0].lower() == 'pypy')
+
 del PY_VER
 if PY3:
     xrange = range
     unicode = str
     unichr = chr
+    long = int
 _chr = chr
 _ord = ord
 
