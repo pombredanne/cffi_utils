@@ -21,95 +21,54 @@
 '''
 
 # Import as: from utils2to3 import long, bytes, chr, ord
+import sys
+import codecs
 
-import six
 
-if six.PY3:
-    long = int
+DEF_ENCODING = 'latin-1'
+PY_VER = sys.version_info[0]
+(PY2, PY3) = (PY_VER == 2, PY_VER == 3)
+del PY_VER
+if PY3:
     xrange = range
-elif six.PY2:
-    long = long
-    xrange = xrange
-
-
-def toBytes(s):
-    '''
-    s-->str (or bytes)
-    Returns-->bytes (works in PY2, PY3)
-    '''
-    if six.PY3:
-        if isinstance(s, bytes):
-            return s
-        elif isinstance(s, str):
-            return encode(s, 'latin-1')
-    elif six.PY2:
-        if isinstance(s, bytearray):
-            return str(s)
-        elif isinstance(s, list):
-            return str(bytearray(s))
-        elif isinstance(s, str):
-            return s
-
-
-def fromBytes(b):
-    '''
-    s-->bytes (or str)
-    Returns-->str (works in PY2, PY3)
-    '''
-    if six.PY3:
-        if isinstance(b, bytes):
-            return decode(b, 'latin-1')
-        elif isinstance(b, list):
-            return decode(bytes(b), 'latin-1')
-        elif isinstance(b, str):
-            return b
-    elif six.PY2:
-        if isinstance(b, bytearray):
-            return str(b)
-        elif isinstance(b, list):
-            return str(bytearray(b))
-        elif isinstance(b, str):
-            return b
-
-
-def encode(s, encoding='latin-1'):
-    '''
-    s-->str
-    encoding-->str: encoding to use. Recommended to use default
-    Returns-->bytes: s encoded to bytes using encoding
-        Works in PY2, PY3
-    '''
-    if six.PY3:
-        import codecs
-        if isinstance(s, str):
-            return bytes(s, encoding)
-        elif isinstance(s, bytes):
-            return codecs.encode(s, encoding)
-    elif six.PY2:
-        if isinstance(s, str):
-            return s.encode(encoding=encoding)
-        elif isinstance(s, bytearray):
-            return toBytes(fromBytes(s).encode(encoding=encoding))
-
-
-def decode(b, encoding='latin-1'):
-    '''
-    b-->bytes
-    encoding-->str: encoding to use. Recommended to use default
-    Returns-->str: b decoded to str using encoding
-        Works in PY2, PY3
-    '''
-    if six.PY3:
-        import codecs
-        return codecs.decode(b, encoding)
-    elif six.PY2:
-        if isinstance(b, str):
-            return b.decode(encoding=encoding)
-        elif isinstance(b, bytearray):
-            return toBytes(fromBytes(b).decode(encoding=encoding))
-
+    unicode = str
+    unichr = chr
 _chr = chr
 _ord = ord
+
+
+def fromBytes(x, encoding=DEF_ENCODING):
+    '''
+    x-->unicode string | bytearray | bytes
+    encoding-->str
+    Returns-->unicode string, with encoding=encoding
+    '''
+    if isinstance(x, unicode):
+        return x
+    if isinstance(x, bytearray):
+        x = bytes(x)
+    elif isinstance(x, bytes):
+        pass
+    # Could raise an exception
+    return codecs.decode(x, encoding)
+
+
+def toBytes(x, encoding=DEF_ENCODING):
+    '''
+    x-->unicode string | bytearray | bytes
+    encoding-->str
+    Returns-->bytes
+
+    If x is unicode, it is encoded using encoding
+    '''
+    if isinstance(x, bytes):
+        return x
+    elif isinstance(x, bytearray):
+        return bytes(x)
+    elif isinstance(x, unicode):
+        pass
+    # Could raise an exception
+    return codecs.encode(x, encoding)
 
 
 def chr(x):
