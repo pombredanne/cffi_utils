@@ -39,7 +39,7 @@
 '''
 from pkg_resources import resource_filename
 import sysconfig
-from .utils2to3 import PYPY
+from .py2to3 import PYPY
 from .ffi import FFIExt
 
 
