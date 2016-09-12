@@ -78,7 +78,7 @@ Extension of cffi.FFI adding a few utility methods
 	     |  get_extension(self)
 
 
-# Module cffi_utils.utils2to3
+# Module cffi_utils.py2to3
 Utility functions for Py2/Py3 compatibility
 
 ### FUNCTIONS

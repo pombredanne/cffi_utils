@@ -102,8 +102,8 @@ CLASSES
          |  
          |  get_extension(self)
 
-Module cffi\_utils.utils2to3
-============================
+Module cffi\_utils.py2to3
+=========================
 
 Utility functions for Py2/Py3 compatibility
 
