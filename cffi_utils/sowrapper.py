@@ -84,7 +84,8 @@ class SharedLibWrapper(object):
 
         self.ffi.cdef(self._c_hdr)
         self._lib = None
-        self._libloaded = False
+        self.loaded = False
+        self.loadable = True
 
     def __openlib(self):
         '''
@@ -95,27 +96,19 @@ class SharedLibWrapper(object):
             try:
                 libres = resource_filename(self._module_name, p)
                 self._lib = self.ffi.dlopen(libres)
+                self.loaded = True
                 return
             except:
                 continue
         # Just try self._libpath if self._module_name is None
         # or nothing in libpath_list worked
-        # We set _libloaded so that we do not try more than once
-        self._libloaded = True
+        # We set loaded so that we do not try more than once
         libres = resource_filename(self._module_name, self._libpath)
-        self._lib = self.ffi.dlopen(libres)
-
-    @property
-    def loadable(self):
-        '''
-        Whether library can be found and loaded
-        Reading this property LOADS the library
-        '''
         try:
-            self.__getattribute_('__openlib')()
-            return True
-        except OSError:
-            return False
+            self._lib = self.ffi.dlopen(libres)
+            self.loaded = True
+        except:
+            self.loadable = False
 
     def __get_libres(self):
         '''
@@ -174,9 +167,7 @@ class SharedLibWrapper(object):
             return [n1, n2]
 
     def __getattr__(self, name):
-        if name == 'loadable':
-            return self.__getattribute__(name)
-        if not self._libloaded:
+        if not self.loaded:
             self.__openlib()
         if self._lib is None:
             return self.__getattribute__(name)
