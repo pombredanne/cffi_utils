@@ -112,7 +112,7 @@ class SharedLibWrapper(object):
         Reading this property LOADS the library
         '''
         try:
-            self._openlib()
+            self.__getattribute_('_openlib')()
             return True
         except OSError:
             return False
