@@ -12,7 +12,7 @@ PACKAGE DATA
 ==============================================================================
 '''
 name = 'cffi_utils'
-version = '0.69'   # oldver: '0.68'
+version = '0.70'   # oldver: '0.69'
 url = 'https://github.com/sundarnagarajan/cffi_utils'
 download_url = '%s/tree/%s' % (url, version)
 packages = find_packages()

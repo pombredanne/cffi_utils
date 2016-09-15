@@ -39,7 +39,7 @@
 '''
 from pkg_resources import resource_filename
 import sysconfig
-from .py2to3 import PYPY
+from .utils2to3 import PYPY
 from .ffi import FFIExt
 
 
@@ -77,39 +77,33 @@ class SharedLibWrapper(object):
         c_hdr-->str: C-style header definitions for functions to wrap
         ffi-->FFIExt or cffi.FFI
         '''
-        self.__libpath = libpath
+        self._libpath = libpath
         self._c_hdr = c_hdr
         self._module_name = module_name
         self.ffi = FFIExt()
 
         self.ffi.cdef(self._c_hdr)
-        self.__lib = None
-        self.__loaded = False
+        self._lib = None
+        self._libloaded = False
 
     def __openlib(self):
         '''
         Actual (lazy) dlopen() only when an attribute is accessed
         '''
-        libpath_list = self.__get_libres() + [resource_filename(
-            self._module_name, self.__libpath)]
-        print('DEBUG: libpath_list: ', libpath_list)
+        libpath_list = self.__get_libres()
         for p in libpath_list:
             try:
                 libres = resource_filename(self._module_name, p)
-                self.__lib = self.ffi.dlopen(libres)
-                self.__loaded = True
+                self._lib = self.ffi.dlopen(libres)
                 return
             except:
                 continue
-        print('DEBUG: __lib: ', self.__lib)
-        self.__loaded = True
-
-    def __getattr__(self, name):
-        if not self.__loaded:
-            self.__openlib()
-        if self.__lib is None:
-            return self.__getattribute__(name)
-        return getattr(self.__lib, name)
+        # Just try self._libpath if self._module_name is None
+        # or nothing in libpath_list worked
+        # We set _libloaded so that we do not try more than once
+        self._libloaded = True
+        libres = resource_filename(self._module_name, self._libpath)
+        self._lib = self.ffi.dlopen(libres)
 
     def __get_libres(self):
         '''
@@ -142,7 +136,7 @@ class SharedLibWrapper(object):
         if self._module_name is None:
             return []
         ending = '.so'
-        base = self.__libpath.rsplit(ending, 1)[0]
+        base = self._libpath.rsplit(ending, 1)[0]
         abi = sysconfig.get_config_var('SOABI')
         if abi is not None:
             abi = '.' + abi
@@ -166,6 +160,13 @@ class SharedLibWrapper(object):
             return [n1, n2, n3]
         else:
             return [n1, n2]
+
+    def __getattr__(self, name):
+        if not self._libloaded:
+            self.__openlib()
+        if self._lib is None:
+            return self.__getattribute__(name)
+        return getattr(self._lib, name)
 
     def get_extension(self):
         return [self.ffi.verifier.get_extension()]
