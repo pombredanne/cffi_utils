@@ -105,12 +105,17 @@ class SharedLibWrapper(object):
         libres = resource_filename(self._module_name, self._libpath)
         self._lib = self.ffi.dlopen(libres)
 
-    def load(self):
+    @property
+    def loadable(self):
         '''
-        Call this to force loading library - and raise OSError if 
-        library cannot be loaded
+        Whether library can be found and loaded
+        Reading this property LOADS the library
         '''
-        self.__openlib()
+        try:
+            self._openlib()
+            return True
+        except OSError:
+            return False
 
     def __get_libres(self):
         '''
