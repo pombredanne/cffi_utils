@@ -85,7 +85,6 @@ class SharedLibWrapper(object):
         self.ffi.cdef(self._c_hdr)
         self._lib = None
         self.loaded = False
-        self.loadable = True
 
     def __openlib(self):
         '''
@@ -108,7 +107,7 @@ class SharedLibWrapper(object):
             self._lib = self.ffi.dlopen(libres)
             self.loaded = True
         except:
-            self.loadable = False
+            raise
 
     def __get_libres(self):
         '''
