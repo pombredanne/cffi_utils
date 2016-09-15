@@ -84,7 +84,7 @@ class SharedLibWrapper(object):
 
         self.ffi.cdef(self._c_hdr)
         self._lib = None
-        self._libloaded = False
+        self.ffi.loaded = False
 
     def __openlib(self):
         '''
@@ -97,6 +97,7 @@ class SharedLibWrapper(object):
             try:
                 libres = resource_filename(self._module_name, p)
                 self._lib = self.ffi.dlopen(libres)
+                self.ffi.loaded = True
                 return
             except:
                 continue
@@ -106,13 +107,13 @@ class SharedLibWrapper(object):
         self._libloaded = True
         libres = resource_filename(self._module_name, self._libpath)
         self._lib = self.ffi.dlopen(libres)
+        self.ffi.loaded = True
 
     def __getattr__(self, name):
         if not self.__getattribute__('_libloaded'):
             self.__openlib()
-        l = self.__getattribute__('_lib')
-        if l:
-            print('lib loaded')
+        if self.ffi.loaded:
+            print('self.ffi.loaded lib loaded')
             try:
                 return getattr(l, name)
             except AttributeError:
