@@ -90,6 +90,8 @@ class SharedLibWrapper(object):
         '''
         Actual (lazy) dlopen() only when an attribute is accessed
         '''
+        if self._libloaded:
+            return
         libpath_list = self.__get_libres()
         for p in libpath_list:
             try:
@@ -104,6 +106,24 @@ class SharedLibWrapper(object):
         self._libloaded = True
         libres = resource_filename(self._module_name, self._libpath)
         self._lib = self.ffi.dlopen(libres)
+
+    '''
+    def __getattr__(self, name):
+        if not self._libloaded:
+            self.__openlib()
+        if self._lib is None:
+            return self.__getattribute__(name)
+        return getattr(self._lib, name)
+    '''
+    def __getattr__(self, name):
+        if self._lib is None:
+            if not self._libloaded:
+                self.__openlib()
+            try:
+                return self.__getattribute__(name)
+            except AttributeError:
+                raise OSError('Cannot load library: ' + self._libpath)
+        return getattr(self._lib, name)
 
     def __get_libres(self):
         '''
@@ -160,13 +180,6 @@ class SharedLibWrapper(object):
             return [n1, n2, n3]
         else:
             return [n1, n2]
-
-    def __getattr__(self, name):
-        if not self._libloaded:
-            self.__openlib()
-        if self._lib is None:
-            return self.__getattribute__(name)
-        return getattr(self._lib, name)
 
     def get_extension(self):
         return [self.ffi.verifier.get_extension()]
