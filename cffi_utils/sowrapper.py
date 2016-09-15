@@ -116,7 +116,7 @@ class SharedLibWrapper(object):
         if self.ffi.loaded:
             print('self.ffi.loaded lib loaded')
             try:
-                return getattr('self._lib', name)
+                return getattr(self._lib, name)
             except AttributeError:
                 return self.__getattribute__(name)
         else:
