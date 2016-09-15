@@ -77,44 +77,37 @@ class SharedLibWrapper(object):
         c_hdr-->str: C-style header definitions for functions to wrap
         ffi-->FFIExt or cffi.FFI
         '''
-        self._libpath = libpath
+        self.__libpath = libpath
         self._c_hdr = c_hdr
         self._module_name = module_name
         self.ffi = FFIExt()
 
         self.ffi.cdef(self._c_hdr)
-        self._lib = None
-        self.loaded = False
+        self.__lib = None
+        self.__loaded = False
 
     def __openlib(self):
         '''
         Actual (lazy) dlopen() only when an attribute is accessed
         '''
-        libpath_list = self.__get_libres()
+        libpath_list = self.__get_libres() + resource_filename(
+            self._module_name, self.__libpath)
         for p in libpath_list:
             try:
                 libres = resource_filename(self._module_name, p)
-                self._lib = self.ffi.dlopen(libres)
-                self.loaded = True
+                self.__lib = self.ffi.dlopen(libres)
+                self.__loaded = True
                 return
             except:
+                self.__loaded = True
                 continue
-        # Just try self._libpath if self._module_name is None
-        # or nothing in libpath_list worked
-        # We set loaded so that we do not try more than once
-        libres = resource_filename(self._module_name, self._libpath)
-        try:
-            self._lib = self.ffi.dlopen(libres)
-            self.loaded = True
-        except:
-            pass
 
     def __getattr__(self, name):
-        if not self.loaded:
+        if not self.__loaded:
             self.__openlib()
-        if self._lib is None:
+        if self.__lib is None:
             return self.__getattribute__(name)
-        return getattr(self._lib, name)
+        return getattr(self.__lib, name)
 
     def __get_libres(self):
         '''
@@ -147,7 +140,7 @@ class SharedLibWrapper(object):
         if self._module_name is None:
             return []
         ending = '.so'
-        base = self._libpath.rsplit(ending, 1)[0]
+        base = self.__libpath.rsplit(ending, 1)[0]
         abi = sysconfig.get_config_var('SOABI')
         if abi is not None:
             abi = '.' + abi
