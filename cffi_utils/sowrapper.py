@@ -108,7 +108,7 @@ class SharedLibWrapper(object):
         self._lib = self.ffi.dlopen(libres)
 
     def __getattr__(self, name):
-        if self.__getattribute__('_lib') is None:
+        if not self.__getattribute__('_libloaded'):
             self.__openlib()
         l = self.__getattribute__('_lib')
         if l:
