@@ -111,17 +111,20 @@ class SharedLibWrapper(object):
         self.ffi.loaded = True
 
     def __getattr__(self, name):
-        print('__getattr__: ', name)
+        print('DEBUG: __getattr__: ', name)
         if not self.__getattribute__('_libloaded'):
+            print('DEBUG: Calling _openlib: ', name)
             self.__openlib()
         if self.ffi.loaded:
-            print('self.ffi.loaded lib loaded')
+            print('DEBUG: self.ffi.loaded lib loaded')
             try:
                 return getattr(self._lib, name)
             except AttributeError:
+                print('DEBUG: not found in lib: ', name)
                 return self.__getattribute__(name)
         else:
-            print('falling back to self attr')
+            print('DEBUG: lib not loaded (yet): ', name)
+            print('DEBUG: falling back to self attr')
             return self.__getattribute__(name)
 
     def __get_libres(self):
