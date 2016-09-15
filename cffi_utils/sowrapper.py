@@ -107,7 +107,7 @@ class SharedLibWrapper(object):
             self._lib = self.ffi.dlopen(libres)
             self.loaded = True
         except:
-            raise
+            pass
 
     def __get_libres(self):
         '''
