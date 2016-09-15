@@ -90,7 +90,7 @@ class SharedLibWrapper(object):
         '''
         Actual (lazy) dlopen() only when an attribute is accessed
         '''
-        if self._libloaded:
+        if self.__getattribute__('_libloaded'):
             return
         libpath_list = self.__get_libres()
         for p in libpath_list:
