@@ -87,8 +87,11 @@ class SharedLibWrapper(object):
         self._libloaded = False
 
     def load(self):
-        self.__openlib()
-        return self.lib is not None
+        try:
+            self.__openlib()
+            return self.lib is not None
+        except OSError:
+            return False
 
     def __openlib(self):
         '''
