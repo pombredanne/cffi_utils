@@ -107,18 +107,12 @@ class SharedLibWrapper(object):
         libres = resource_filename(self._module_name, self._libpath)
         self._lib = self.ffi.dlopen(libres)
 
-    '''
-    def __getattr__(self, name):
-        if not self._libloaded:
-            self.__openlib()
-        if self._lib is None:
-            return self.__getattribute__(name)
-        return getattr(self._lib, name)
-    '''
     def __getattr__(self, name):
         if self._lib is None:
             self.__openlib()
-        if self._libloaded:
+            if name == '_lib':
+                return self.__getattribute__(name)
+        if self._lib:
             try:
                 return getattr(self._lib, name)
             except AttributeError:
