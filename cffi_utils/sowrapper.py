@@ -164,8 +164,6 @@ class SharedLibWrapper(object):
     def __getattr__(self, name):
         if not self._libloaded:
             self.__openlib()
-        if name == '_lib':
-            return self.__getattribute__(name)
         if self._lib is None:
             return self.__getattribute__(name)
         return getattr(self._lib, name)
