@@ -85,7 +85,10 @@ class SharedLibWrapper(object):
         self.ffi.cdef(self._c_hdr)
         self.lib = None
         self._libloaded = False
-        self.ffi.loaded = False
+
+    def load(self):
+        self.__openlib()
+        return self.lib is not None
 
     def __openlib(self):
         '''
@@ -98,7 +101,6 @@ class SharedLibWrapper(object):
             try:
                 libres = resource_filename(self._module_name, p)
                 self.lib = self.ffi.dlopen(libres)
-                self.ffi.loaded = True
                 return
             except:
                 continue
@@ -108,23 +110,16 @@ class SharedLibWrapper(object):
         self._libloaded = True
         libres = resource_filename(self._module_name, self._libpath)
         self.lib = self.ffi.dlopen(libres)
-        self.ffi.loaded = True
 
     def __getattr__(self, name):
-        print('DEBUG: __getattr__: ', name)
         if not self.__getattribute__('_libloaded'):
-            print('DEBUG: Calling _openlib: ', name)
             self.__openlib()
         if self.__getattribute__('lib') is not None:
-            print('DEBUG: self.lib is set')
             try:
                 return getattr(self.lib, name)
             except AttributeError:
-                print('DEBUG: not found in lib: ', name)
                 return self.__getattribute__(name)
         else:
-            print('DEBUG: lib not loaded (yet): ', name)
-            print('DEBUG: falling back to self attr')
             return self.__getattribute__(name)
 
     def __get_libres(self):
