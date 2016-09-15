@@ -107,7 +107,7 @@ class SharedLibWrapper(object):
         try:
             self._lib = self.ffi.dlopen(libres)
             self.loaded = True
-            self.loadable = false
+            self.loadable = False
         except:
             pass
 
