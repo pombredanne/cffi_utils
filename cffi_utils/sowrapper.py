@@ -115,8 +115,8 @@ class SharedLibWrapper(object):
         if not self.__getattribute__('_libloaded'):
             print('DEBUG: Calling _openlib: ', name)
             self.__openlib()
-        if self.ffi.loaded:
-            print('DEBUG: self.ffi.loaded lib loaded')
+        if self.__getattribute__('lib') is not None:
+            print('DEBUG: self.lib is set')
             try:
                 return getattr(self.lib, name)
             except AttributeError:
