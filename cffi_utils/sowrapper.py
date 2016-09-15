@@ -108,11 +108,11 @@ class SharedLibWrapper(object):
         self._lib = self.ffi.dlopen(libres)
 
     def __getattr__(self, name):
-        if self._lib is None:
-            self.__openlib()
-            if name in ['_lib', '_libloaded']:
-                print('DEBUG: returning _lib after _openlib()')
-                return self.__getattribute__(name)
+        if name in ['_lib', '_libloaded']:
+            if self._lib is None:
+                self.__openlib()
+            print('DEBUG: returning _lib after _openlib()')
+            return self.__getattribute__(name)
         if self._lib:
             try:
                 return getattr(self._lib, name)
