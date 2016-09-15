@@ -117,13 +117,14 @@ class SharedLibWrapper(object):
     '''
     def __getattr__(self, name):
         if self._lib is None:
-            if not self._libloaded:
-                self.__openlib()
+            self.__openlib()
+        if self._libloaded:
             try:
-                return self.__getattribute__(name)
+                return getattr(self._lib, name)
             except AttributeError:
-                raise OSError('Cannot load library: ' + self._libpath)
-        return getattr(self._lib, name)
+                return self.__getattribute__(name)
+        else:
+            return self.__getattribute__(name)
 
     def __get_libres(self):
         '''
