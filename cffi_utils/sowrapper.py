@@ -81,12 +81,18 @@ class SharedLibWrapper(object):
         self._c_hdr = c_hdr
         self._module_name = module_name
         self.ffi = FFIExt()
+        self.lib = None
 
         self.ffi.cdef(self._c_hdr)
-        self.lib = None
         self._libloaded = False
 
     def load(self):
+        '''
+        Returns-->boolean: whether library could be loaded
+        When this is called, the library would have been loaded if possible
+        If this is not called, the first invocation of a method in lib
+        CAN raise OSError if shared library cannot be loaded
+        '''
         try:
             self.__openlib()
             return self.lib is not None
