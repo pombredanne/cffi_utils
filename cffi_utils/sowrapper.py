@@ -111,6 +111,7 @@ class SharedLibWrapper(object):
         if self._lib is None:
             self.__openlib()
             if name == '_lib':
+                print('DEBUG: returning _lib after _openlib()')
                 return self.__getattribute__(name)
         if self._lib:
             try:
