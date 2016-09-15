@@ -111,6 +111,7 @@ class SharedLibWrapper(object):
         self.ffi.loaded = True
 
     def __getattr__(self, name):
+        print('__getattr__: ', name)
         if not self.__getattribute__('_libloaded'):
             self.__openlib()
         if self.ffi.loaded:
