@@ -83,7 +83,7 @@ class SharedLibWrapper(object):
         self.ffi = FFIExt()
 
         self.ffi.cdef(self._c_hdr)
-        self._lib = None
+        self.lib = None
         self._libloaded = False
         self.ffi.loaded = False
 
@@ -97,7 +97,7 @@ class SharedLibWrapper(object):
         for p in libpath_list:
             try:
                 libres = resource_filename(self._module_name, p)
-                self._lib = self.ffi.dlopen(libres)
+                self.lib = self.ffi.dlopen(libres)
                 self.ffi.loaded = True
                 return
             except:
@@ -107,7 +107,7 @@ class SharedLibWrapper(object):
         # We set _libloaded so that we do not try more than once
         self._libloaded = True
         libres = resource_filename(self._module_name, self._libpath)
-        self._lib = self.ffi.dlopen(libres)
+        self.lib = self.ffi.dlopen(libres)
         self.ffi.loaded = True
 
     def __getattr__(self, name):
@@ -118,7 +118,7 @@ class SharedLibWrapper(object):
         if self.ffi.loaded:
             print('DEBUG: self.ffi.loaded lib loaded')
             try:
-                return getattr(self._lib, name)
+                return getattr(self.lib, name)
             except AttributeError:
                 print('DEBUG: not found in lib: ', name)
                 return self.__getattribute__(name)
