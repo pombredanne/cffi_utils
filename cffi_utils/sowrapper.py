@@ -84,6 +84,7 @@ class SharedLibWrapper(object):
 
         self.ffi.cdef(self._c_hdr)
         self._lib = None
+        self._libloaded = False
         self.ffi.loaded = False
 
     def __openlib(self):
@@ -115,7 +116,7 @@ class SharedLibWrapper(object):
         if self.ffi.loaded:
             print('self.ffi.loaded lib loaded')
             try:
-                return getattr(l, name)
+                return getattr('self._lib', name)
             except AttributeError:
                 return self.__getattribute__(name)
         else:
