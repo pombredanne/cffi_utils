@@ -99,8 +99,8 @@ class SharedLibWrapper(object):
                 self.__loaded = True
                 return
             except:
-                self.__loaded = True
                 continue
+        self.__loaded = True
 
     def __getattr__(self, name):
         if not self.__loaded:
