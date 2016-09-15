@@ -92,6 +92,7 @@ class SharedLibWrapper(object):
         '''
         libpath_list = self.__get_libres() + [resource_filename(
             self._module_name, self.__libpath)]
+        print('DEBUG: libpath_list: ', libpath_list)
         for p in libpath_list:
             try:
                 libres = resource_filename(self._module_name, p)
@@ -100,6 +101,7 @@ class SharedLibWrapper(object):
                 return
             except:
                 continue
+        print('DEBUG: __lib: ', self.__lib)
         self.__loaded = True
 
     def __getattr__(self, name):
