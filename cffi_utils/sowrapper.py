@@ -110,7 +110,7 @@ class SharedLibWrapper(object):
     def __getattr__(self, name):
         if self.__getattribute__('_lib') is None:
             self.__openlib()
-        l = self.__getattribute__('_lib'):
+        l = self.__getattribute__('_lib')
         if l:
             print('lib loaded')
             try:
