@@ -90,8 +90,8 @@ class SharedLibWrapper(object):
         '''
         Actual (lazy) dlopen() only when an attribute is accessed
         '''
-        libpath_list = self.__get_libres() + resource_filename(
-            self._module_name, self.__libpath)
+        libpath_list = self.__get_libres() + [resource_filename(
+            self._module_name, self.__libpath)]
         for p in libpath_list:
             try:
                 libres = resource_filename(self._module_name, p)
