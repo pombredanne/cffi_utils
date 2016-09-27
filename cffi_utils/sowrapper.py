@@ -37,6 +37,8 @@
         lib-->SharedLibWrapper instance - use methods on this object to
             call methods in the shared library
 '''
+import sys
+import os
 from pkg_resources import resource_filename
 import sysconfig
 from .py2to3 import PYPY
@@ -113,12 +115,29 @@ class SharedLibWrapper(object):
                 return
             except:
                 continue
-        # Just try self._libpath if self._module_name is None
-        # or nothing in libpath_list worked
-        # We set _libloaded so that we do not try more than once
-        self._libloaded = True
-        libres = resource_filename(self._module_name, self._libpath)
-        self.lib = self.ffi.dlopen(libres)
+        # Try self._libpath if nothing in libpath_list worked - will work
+        # only if self._module_name is set
+        try:
+            libres = resource_filename(self._module_name, self._libpath)
+            self.lib = self.ffi.dlopen(libres)
+        except:
+            # If self._module_name is in sys.modules, try self._libpath
+            # in the same dir as sys.modules[self._module_name].__file__
+            # This is allows get_lib_ffi_shared to work in REPL
+            try:
+                # We set _libloaded to indicate all options have been tried
+                self._libloaded = True
+
+                libdir = ''
+                if self._module_name is not None:
+                    mod = sys.modules.get(self._module_name, None)
+                    if mod is not None:
+                        libdir = os.path.dirname(mod.__file__) or os.getcwd()
+
+                libres = os.path.join(libdir, self._libpath)
+                self.lib = self.ffi.dlopen(libres)
+            except:
+                return None
 
     def __getattr__(self, name):
         if not self.__getattribute__('_libloaded'):
